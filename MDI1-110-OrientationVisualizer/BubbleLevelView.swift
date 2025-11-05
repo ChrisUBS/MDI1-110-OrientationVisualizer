@@ -11,26 +11,32 @@ struct BubbleLevelView: View {
     @ObservedObject var vm: MotionVM
     var targetTolerance: Double = 3
     var radius: CGFloat = 110
-    
+
     var body: some View {
         ZStack {
-            // Outer circle (main frame)
+            // Outer circle
             Circle()
                 .stroke(lineWidth: 2)
                 .foregroundStyle(.secondary)
                 .frame(width: radius * 2, height: radius * 2)
-            
-            // Crosshair lines
-            Path { p in
-                p.move(to: CGPoint(x: -radius, y: 0))
-                p.addLine(to: CGPoint(x: radius, y: 0))
-                p.move(to: CGPoint(x: 0, y: -radius))
-                p.addLine(to: CGPoint(x: 0, y: radius))
+
+            // Centered dashed crosshair
+            GeometryReader { geo in
+                let center = CGPoint(x: geo.size.width / 2, y: geo.size.height / 2)
+
+                Path { path in
+                    // Horizontal line
+                    path.move(to: CGPoint(x: center.x - radius, y: center.y))
+                    path.addLine(to: CGPoint(x: center.x + radius, y: center.y))
+                    // Vertical line
+                    path.move(to: CGPoint(x: center.x, y: center.y - radius))
+                    path.addLine(to: CGPoint(x: center.x, y: center.y + radius))
+                }
+                .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
+                .foregroundStyle(.tertiary)
             }
-            .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
-            .foregroundStyle(.tertiary)
             .frame(width: radius * 2, height: radius * 2)
-            
+
             // Bubble indicator
             Circle()
                 .fill(isLevel ? Color.green.opacity(0.75) : Color.orange.opacity(0.75))
@@ -46,7 +52,7 @@ struct BubbleLevelView: View {
                 Text(String(format: "roll %.1f°   pitch %.1f°", vm.rollDeg, vm.pitchDeg))
                     .font(.caption)
                     .monospacedDigit()
-                
+
                 Text(String(format: "Hz %.0f", vm.sampleHz))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -55,11 +61,11 @@ struct BubbleLevelView: View {
         }
         .accessibilityLabel("Bubble level")
     }
-    
+
     private var isLevel: Bool {
         abs(vm.rollDeg) <= targetTolerance && abs(vm.pitchDeg) <= targetTolerance
     }
-    
+
     private var bubbleOffset: CGSize {
         let scale: CGFloat = radius / 15
         var x = CGFloat(vm.rollDeg) * scale

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OrientationRootView: View {
-    @StateObject private var vm = MotionVM()
+    @ObservedObject var vm: MotionVM
     @State private var hz: Double = 60
     @State private var showCube: Bool = false
     @State private var demoMode: Bool = false
@@ -29,7 +29,7 @@ struct OrientationRootView: View {
                 }
                 
                 if showCube {
-                    OrientationCubeView(qx: vm.qx, qy: vm.qy, qz: vm.qz, qw: vm.qw)
+                    OrientationCubeView(vm: vm)
                         .frame(height: 220)
                         .padding(.vertical, 4)
                         .transition(.opacity.combined(with: .scale))
@@ -75,8 +75,4 @@ struct OrientationRootView: View {
             }
         }
     }
-}
-
-#Preview {
-    OrientationRootView()
 }

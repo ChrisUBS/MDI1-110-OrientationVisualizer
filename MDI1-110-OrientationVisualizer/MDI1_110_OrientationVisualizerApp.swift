@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct MDI1_110_OrientationVisualizerApp: App {
+    @StateObject private var vm = MotionVM()
+    
     var body: some Scene {
         WindowGroup {
-            OrientationRootView()
+            OrientationRootView(vm: vm)
         }
     }
 }

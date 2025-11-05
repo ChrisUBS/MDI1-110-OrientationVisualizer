@@ -1,18 +1,8 @@
-//
-//  OrientationCubeView.swift
-//  MDI1-110-OrientationVisualizer
-//
-//  Created by Christian Bonilla on 04/11/25.
-//
-
 import SwiftUI
 import SceneKit
 
 struct OrientationCubeView: UIViewRepresentable {
-    var qx: Double
-    var qy: Double
-    var qz: Double
-    var qw: Double
+    @ObservedObject var vm: MotionVM
 
     func makeUIView(context: Context) -> SCNView {
         let v = SCNView()
@@ -47,15 +37,14 @@ struct OrientationCubeView: UIViewRepresentable {
     }
 
     func updateUIView(_ v: SCNView, context: Context) {
-        context.coordinator.node?.orientation =
-            SCNQuaternion(Float(qx), Float(qy), Float(qz), Float(qw))
+        let q = SCNQuaternion(Float(vm.qx), Float(vm.qy), Float(vm.qz), Float(vm.qw))
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 0.05
+        context.coordinator.node?.orientation = q
+        SCNTransaction.commit()
     }
 
-    func makeCoordinator() -> Coord {
-        Coord()
-    }
+    func makeCoordinator() -> Coord { Coord() }
 
-    final class Coord {
-        var node: SCNNode?
-    }
+    final class Coord { var node: SCNNode? }
 }
